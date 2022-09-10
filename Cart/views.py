@@ -101,6 +101,7 @@ def user_open_order(request):
             for det in z:
                 # order_detail_list.append(det)
                 id = z[det]['id']
+                # if z[det][]
                 product = Product.objects.get(id=id)
                 price_color = 0
                 try:

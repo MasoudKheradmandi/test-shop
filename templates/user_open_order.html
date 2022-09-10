@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load ano_tag %}
 
 
 {% block body %}
@@ -142,13 +143,17 @@
                                     <td class="cart__price-wrapper cart-flex-item">
                                         <span class="money">{{det.price}} تومان</span>
                                     </td>
+                                    
                                     <td class="cart__update-wrapper cart-flex-item">
                                         <div class="cart__qty text-center">
                                             <div class="qtyField">
-                                                <input class="cart__qty-input qty" type="text"  value="{{det.count}}" pattern="[0-9]*" disabled>
+                                                <a class="qtyBtn minus" href="javascript:void(0);"><i class="icon icon-minus"></i></a>
+                                                <input data-max="{% tedad_mahsole det.product.id %}" class="cart__qty-input qty" max="{% tedad_mahsole det.product.id %}" type="number"  value="{{det.count}}" pattern="[0-9]*" disabled>
+                                                <a class="qtyBtn plus" href="javascript:void(0);"><i class="icon icon-plus"></i></a>
                                             </div>
                                         </div>
                                     </td>
+                                            
                                     <td class="small--hide cart-price">
                                         <div><span class="money">{{det.get_detail_sum}}</span></div>
                                     </td>
@@ -288,5 +293,28 @@
         })
 
     })
+</script>
+<script>
+function qnt_incre(){
+    $(".qtyBtn").on("click", function() {
+        var qtyField = $(this).parent(".qtyField"),
+        oldValue = $(qtyField).find(".qty").val(),
+        
+        newVal = 1;
+
+        if ($(this).is(".plus")) {
+        max = $(qtyField).find(".qty").data('max')
+        if (oldValue < max ) {
+            newVal = parseInt(oldValue) + 1;        
+            $(qtyField).find(".qty").val(newVal);
+        }
+        } else if (oldValue > 1) {
+        newVal = parseInt(oldValue) - 1;
+        $(qtyField).find(".qty").val(newVal);
+        }
+    });
+}
+qnt_incre()
+//what
 </script>
 {% endblock %}

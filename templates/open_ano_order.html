@@ -144,7 +144,9 @@
                                 <td class="cart__update-wrapper cart-flex-item">
                                     <div class="cart__qty text-center">
                                         <div class="qtyField">
-                                            <input disabled class="cart__qty-input qty" type="text" name="updates[]" value="{% show details det 'count' %}" pattern="[0-9]*">
+                                            <a class="qtyBtn minus" href="javascript:void(0);"><i class="icon icon-minus"></i></a>
+                                            <input disabled data-max="{% tedad_mahsole det %}" class="cart__qty-input qty" type="text" name="updates[]" value="{% show details det 'count' %}" pattern="[0-9]*">
+                                            <a class="qtyBtn plus" href="javascript:void(0);"><i class="icon icon-plus"></i></a>
                                         </div>
                                     </div>
                                 </td>
@@ -291,5 +293,40 @@
         })
 
     })
+</script>
+<script>
+function qnt_incre(){
+    $(".qtyBtn").on("click", function() {
+        var qtyField = $(this).parent(".qtyField"),
+        oldValue = $(qtyField).find(".qty").val(),
+        
+        newVal = 1;
+
+        if ($(this).is(".plus")) {
+        max = $(qtyField).find(".qty").data('max')
+        if (oldValue < max ) {
+            newVal = parseInt(oldValue) + 1;        
+            $(qtyField).find(".qty").val(newVal);
+        }
+        } else if (oldValue > 1) {
+        newVal = parseInt(oldValue) - 1;
+        $(qtyField).find(".qty").val(newVal);
+        }
+    });
+}
+qnt_incre()
+//what
+</script>
+<script>
+$(".qtyBtn").on("load",function() {
+    var qtyField = $(this).parent(".qtyField")
+    oldValue = $(qtyField).find(".qty").val()
+    max = $(qtyField).find(".qty").data('max')
+    alert(oldValue)
+    alert(max)
+    if (oldValue > max ) {      
+        $(qtyField).find(".qty").val(max);
+    }
+});
 </script>
 {% endblock %}

@@ -8,7 +8,8 @@ def show(details,det=None,arg=None):
     if arg == None:
         x = Product.objects.get(id=det)
         return x.image.url
-    return details[det][arg]
+    else:
+        return details[det][arg]
 
 @register.simple_tag
 def show_price(details,id,count=None):
@@ -35,6 +36,10 @@ def show_price(details,id,count=None):
     else:
         return total_price*count
 
+@register.simple_tag
+def tedad_mahsole(details):
+    x = Product.objects.get(id=details)
+    return x.tedad_mahsole
 
 # @register.simple_tag
 # def total_single_price(details,id,count):
