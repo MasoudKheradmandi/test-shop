@@ -7,8 +7,11 @@ import json
 from payment.models import PayedOrder , PayedOrderDetail
 from django.utils import timezone
 from account.models import Profile
+from cryptography.fernet import Fernet
 from account.forms import InfoForm
 # Create your views here.
+# f_obj = Fernet(Fernet.generate_key())
+
 def add_user_order(request):
     form = NewOrderForm(request.POST or None)
     if form.is_valid():
@@ -66,6 +69,7 @@ def add_user_order(request):
                 response = redirect('/cart')
                 x = {product_id:{'id':product_id,'color':color,'size':size,'count':count}}
                 jsonstyle = json.dumps(x)
+
                 response.set_cookie('OrderDetail',jsonstyle,172800)
                 response.set_cookie('Order',order.id,172800)
                 order.delete()
@@ -89,9 +93,11 @@ def user_open_order(request):
             context['total'] = open_order.get_total_price()
     else:
         total_price = 0
-        try :
+        try:
             detail = request.COOKIES['OrderDetail']
+
             z = json.loads(detail)
+            print(z)
             for det in z:
                 # order_detail_list.append(det)
                 id = z[det]['id']
@@ -114,7 +120,7 @@ def user_open_order(request):
             context['details'] = z
             context['total'] = total_price
         except:
-            pass
+            print("erer")
         return render(request,'open_ano_order.html',context)
 
 

@@ -1,5 +1,4 @@
 from product.models import Product
-from cryptography.fernet import Fernet
 from django.shortcuts import render,redirect
 import random
 from .models import Profile,MyUser
@@ -29,10 +28,6 @@ def send_sms_test(request):
         if form.is_valid():
 
             phone =form.cleaned_data['phone']
-            f_obj = Fernet(Fernet.generate_key())
-            x = f_obj.encrypt(phone.encode())
-            m = f_obj.decrypt(x).decode()
-            print(m)
             if MyUser.objects.filter(phone=phone):
                 MyUser.objects.filter(phone=phone).update(token=number)
             else:
@@ -48,7 +43,7 @@ def send_sms_test(request):
 
             response = render(request,'account/verify.html')
             
-            response.set_cookie('phone_number_cookie',x,1000)
+            response.set_cookie('phone_number_cookie',phone,1000)
             return response
         else:
             messages.success(request,'درست وارد کنید')
@@ -60,8 +55,6 @@ def VerifyChecked(request):
     if request.method == "POST":
         token = request.POST.get('token')
         phone_c = request.COOKIES['phone_number_cookie']
-        f_obj = Fernet(Fernet.generate_key())
-        phone_c = f_obj.decrypt(phone_c).decode()
         #----------------------------------------
         try :
             user = MyUser.objects.get(phone= phone_c)
