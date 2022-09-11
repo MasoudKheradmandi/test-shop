@@ -23,7 +23,7 @@ class Order(models.Model):
         return str(self.owner)
 
 class OrderDetail(models.Model):
-    order = models.ForeignKey(Order,on_delete=models.CASCADE)
+    order = models.ForeignKey(Order,on_delete=models.CASCADE,null=True)
     product = models.ForeignKey(Product,on_delete=models.CASCADE)
     price = models.IntegerField()
     color = ColorField(null=True)

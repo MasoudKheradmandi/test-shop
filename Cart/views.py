@@ -9,6 +9,7 @@ from django.utils import timezone
 from account.models import Profile
 from cryptography.fernet import Fernet
 from account.forms import InfoForm
+from Cart.forms import NewOrderForm
 # Create your views here.
 # f_obj = Fernet(Fernet.generate_key())
 
@@ -19,7 +20,7 @@ def add_user_order(request):
             order = Order.objects.filter(owner_id=request.user.id,is_paid=False).first()
             if order is None:
                 order = Order.objects.create(owner_id=request.user.id,is_paid=False)
-    
+
         product_id =form.cleaned_data['product_id']    
         color = form.cleaned_data['color']
         size =form.cleaned_data['size']
@@ -49,7 +50,6 @@ def add_user_order(request):
                     product=product
                 ).update(count=count,size=size,color=color,price=total_price)
             else:
-
                 order.orderdetail_set.create(
                     product=product,price=total_price,count=count,size=size,color=color
                 )
@@ -58,7 +58,26 @@ def add_user_order(request):
             try:
                 x = request.COOKIES['OrderDetail']
                 jsonstyle = json.loads(x)
-                jsonstyle[product_id] = {'id':product_id,'color':color,'size':size,'count':count}
+                orderdetail = OrderDetail.objects.create(product=product,color=color,count=count,size=size,price=total_price)
+                
+                for x in jsonstyle:
+                    if jsonstyle[x]['id'] == product_id:
+                        print(jsonstyle[x]['size'],'testtttttttttttttt')
+                        print(size)
+                        if  jsonstyle[x]['color'] == color and jsonstyle[x]['size'] == size :
+                            jsonstyle[x] = {'id':product_id,'color':color,'size':size,'count':count}
+                            break
+                        else :
+                            jsonstyle[orderdetail.id] = {'id':product_id,'color':color,'size':size,'count':count}
+                            break
+                        
+                    else:    
+                        jsonstyle[orderdetail.id] = {'id':product_id,'color':color,'size':size,'count':count}
+                        break
+                else:
+                    jsonstyle[orderdetail.id] = {'id':product_id,'color':color,'size':size,'count':count}
+                
+                orderdetail.delete()
                 jsonstyle2 = json.dumps(jsonstyle)
                 response = redirect('/cart')
                 response.delete_cookie('OrderDetail')
@@ -66,19 +85,22 @@ def add_user_order(request):
                 return response 
             except:
                 order = Order.objects.create()
-                response = redirect('/cart')
-                x = {product_id:{'id':product_id,'color':color,'size':size,'count':count}}
+                orderdetail = OrderDetail.objects.create(product=product,color=color,count=count,size=size,price=total_price)
+                x = {orderdetail.id:{'id':product_id,'color':color,'size':size,'count':count}}
+                orderdetail.delete()
                 jsonstyle = json.dumps(x)
-
+                response = redirect('/cart')
                 response.set_cookie('OrderDetail',jsonstyle,172800)
                 response.set_cookie('Order',order.id,172800)
                 order.delete()
                 return response 
     else:
-        return redirect('/cart/')
+        print('test')
+        return redirect('/')
 
 def user_open_order(request):
     context = {
+    'form': NewOrderForm() ,
     'order':None,
     'details':None,
     'total':0,
@@ -86,6 +108,15 @@ def user_open_order(request):
     }
     if request.user.is_authenticated:
         open_order = Order.objects.filter(owner_id=request.user.id,is_paid=False).first()
+        # چک کنیم که تعداد محصول در یبد خرید بیشتر از موجودی نباشه
+        for x in open_order.orderdetail_set.all():
+            product = Product.objects.get(id=x.product.id)
+            print(x.count)
+            print(product.tedad_mahsole)
+            if x.count > product.tedad_mahsole:
+                x.count = product.tedad_mahsole
+                x.save()
+        ################################################################
         if open_order is not None:
             context['order'] = open_order
             context['details'] = open_order.orderdetail_set.all()
@@ -95,14 +126,13 @@ def user_open_order(request):
         total_price = 0
         try:
             detail = request.COOKIES['OrderDetail']
-
             z = json.loads(detail)
-            print(z)
             for det in z:
-                # order_detail_list.append(det)
                 id = z[det]['id']
-                # if z[det][]
                 product = Product.objects.get(id=id)
+                if z[det]['count'] > product.tedad_mahsole:
+                    z[det]['count'] = product.tedad_mahsole
+
                 price_color = 0
                 try:
                     x = product.color_set.get(color=z[det]['color'])
@@ -169,9 +199,6 @@ def order_payed(request):
             
         )
     return HttpResponse('paid')
-    
-
-
 
 def addressView(request):
     context = {
@@ -183,3 +210,75 @@ def addressView(request):
     if open_order is not None:
         context['total'] = open_order.get_total_price()
     return render(request,'address.html',context)
+
+
+
+
+def update_In_open_order(request):
+    form = NewOrderForm(request.POST or None)
+    if form.is_valid():
+        if request.user.is_authenticated:
+            order = Order.objects.filter(owner_id=request.user.id,is_paid=False).first()
+        product_id =form.cleaned_data['product_id']    
+        color = form.cleaned_data['color']
+        size =form.cleaned_data['size']
+        count = form.cleaned_data['count']
+        
+        product = Product.objects.get(id=product_id)
+        
+        if count < 1 or count > product.tedad_mahsole : 
+            return redirect('/cart/')
+        
+        price_color = 0
+        try:
+            x = product.color_set.get(color=color)
+            price_color = x.Ekhtelaf
+        except:
+            pass
+        price_size = 0
+        try:
+            x = product.size_set.get(size=size)
+            price_size = x.Ekhtelaf
+        except:
+            pass
+        total_price = price_color + price_size + product.main_discount_cal(inti=True)
+        if request.user.is_authenticated:
+            if order.orderdetail_set.filter(product=product,size=size,color=color):
+                order.orderdetail_set.filter(
+                    product=product ,size=size,color=color,
+                ).update(count=count,price=total_price)
+            else:
+                order.orderdetail_set.create(
+                    product=product,price=total_price,count=count,size=size,color=color
+                )
+            return redirect('/cart')
+        else:
+            try:
+                x = request.COOKIES['OrderDetail']
+                jsonstyle = json.loads(x)
+                orderdetail = OrderDetail.objects.create(product=product,color=color,count=count,size=size,price=total_price)
+                
+                for x in jsonstyle:
+                    if jsonstyle[x]['id'] == product_id and jsonstyle[x]['color'] == color and jsonstyle[x]['size'] == size:
+                        jsonstyle[x] = {'id':product_id,'color':color,'size':size,'count':count}
+                
+                orderdetail.delete()
+                jsonstyle2 = json.dumps(jsonstyle)
+                response = redirect('/cart')
+                response.delete_cookie('OrderDetail')
+                response.set_cookie('OrderDetail',jsonstyle2,172800)
+                return response 
+            except:
+                order = Order.objects.create()
+                orderdetail = OrderDetail.objects.create(product=product,color=color,count=count,size=size,price=total_price)
+                x = {orderdetail.id:{'id':product_id,'color':color,'size':size,'count':count}}
+                orderdetail.delete()
+                jsonstyle = json.dumps(x)
+                response = redirect('/cart')
+                response.set_cookie('OrderDetail',jsonstyle,172800)
+                response.set_cookie('Order',order.id,172800)
+                order.delete()
+                return response 
+    else:
+        print('test')
+        return redirect('/')

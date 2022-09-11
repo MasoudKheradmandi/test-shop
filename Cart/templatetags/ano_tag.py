@@ -6,18 +6,18 @@ register = template.Library()
 @register.simple_tag
 def show(details,det=None,arg=None):
     if arg == None:
-        x = Product.objects.get(id=det)
+        x = Product.objects.get(id=details[det]['id'])
         return x.image.url
     else:
         return details[det][arg]
 
 @register.simple_tag
-def show_price(details,id,count=None):
-    size = show(details,id,'size')
-    color = show(details,id,'color')
+def show_price(details,det,count=None):
+    size = show(details,det,'size')
+    color = show(details,det,'color')
     if count:
-        count = show(details,id,'count')
-    product = Product.objects.get(id=id)
+        count = show(details,det,'count')
+    product = Product.objects.get(id=details[det]['id'])
     price_color = 0
     try:
         x = product.color_set.get(color=color)
@@ -37,10 +37,22 @@ def show_price(details,id,count=None):
         return total_price*count
 
 @register.simple_tag
-def tedad_mahsole(details):
-    x = Product.objects.get(id=details)
+def tedad_mahsole2(id):
+    x = Product.objects.get(id=id)
     return x.tedad_mahsole
 
+
+@register.simple_tag
+def show_name(details,det=None):
+    x = Product.objects.get(id=details[det]['id'])
+    return x
+
+
+
+@register.simple_tag
+def tedad_mahsole(details,det):
+    x = Product.objects.get(id=details[det]['id'])
+    return x.tedad_mahsole
 # @register.simple_tag
 # def total_single_price(details,id,count):
 #     total_price = show_price()

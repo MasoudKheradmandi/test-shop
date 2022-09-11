@@ -112,7 +112,7 @@
     <div class="container">
         <div class="row">
             <div class="col-12 col-sm-12 col-md-8 col-lg-8 main-col">
-                <form action="#" method="post" class="cart style2">
+                <div class="cart style2">
                     <table>
                         <thead class="cart__row cart__header">
                             <tr>
@@ -125,13 +125,19 @@
                         </thead>
                         <tbody>
                         {% for det in details %}
+                        <form method='post' action="{% url 'Cart:update_In_open_order' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name='product_id' value="{% show details det 'id' %}">                     
+                            <input type="hidden" name='size' value="{% show details det 'size' %}">
+                            <input type="hidden" name='color' value="{% show details det 'color' %}">
+
                             <tr class="cart__row border-bottom line1 cart-flex border-top">
                                 <td class="cart__image-wrapper cart-flex-item">
-                                    <a href="#"><img class="cart__image" src="{% show details det %}" alt="Elastic Waist Dress - Navy / Small"></a>
+                                    <a href="/detail/{% show details det 'id' %}"><img class="cart__image" src="{% show details det %}" alt="Elastic Waist Dress - Navy / Small"></a>
                                 </td>
                                 <td class="cart__meta small--text-left cart-flex-item">
                                     <div class="list-view-item__title">
-                                        <a href="#">{{det.product}}</a>
+                                        <a href="/detail/{% show details det 'id' %}">{% show_name details det  %}</a>
                                     </div>
                                     
                                     <div class="cart__meta-text">
@@ -145,22 +151,30 @@
                                     <div class="cart__qty text-center">
                                         <div class="qtyField">
                                             <a class="qtyBtn minus" href="javascript:void(0);"><i class="icon icon-minus"></i></a>
-                                            <input disabled data-max="{% tedad_mahsole det %}" class="cart__qty-input qty" type="text" name="updates[]" value="{% show details det 'count' %}" pattern="[0-9]*">
+                                            <input  data-max="{% tedad_mahsole details det %}" class="cart__qty-input qty" type="text" name="count" value="{% show details det 'count' %}" >
                                             <a class="qtyBtn plus" href="javascript:void(0);"><i class="icon icon-plus"></i></a>
+                                            
                                         </div>
+                                        
                                     </div>
+
                                 </td>
+                                
                                 <td class="small--hide cart-price">
                                     <div><span class="money">{% show_price details det 'count' %}</span></div>
                                 </td>
-                                <td class="text-center small--hide"><a  id="removebtn" href="#" data-href='{{det}}' class="btn btn--secondary cart__remove" title="حذف"><i class="icon icon anm anm-times-l"></i></a></td>
+                                <td colspan="3" class="text-left"><button type="submit" class="btn--link cart-update"><i class="fa fa-refresh"></i> به روز رسانی</button></td>
+
+                                <td class="text-center small--hide"><a  class="removebtn" href="#" data-href='{{det}}' class="btn btn--secondary cart__remove" title="حذف"><i class="icon icon anm anm-times-l"></i></a></td>
                             </tr>
-                            {% endfor %}
+                        </form>
                         </tbody>
+                    {% endfor %}
                         <tfoot>
                             <tr>
                                 <td colspan="3" class="text-right"><a href="{% url 'poduct:listview' %}" class="btn--link cart-continue"><i class="icon icon-arrow-circle-right"></i> ادامه خرید</a></td>
                                 {% comment %} <td colspan="3" class="text-left"><button type="submit" name="update" class="btn--link cart-update"><i class="fa fa-refresh"></i> به روز رسانی</button></td> {% endcomment %}
+                                
                             </tr>
                         </tfoot>
                 </table>
@@ -233,7 +247,7 @@
                         </div>
                     </div> {% endcomment %}
                 </div>
-                </form>                   
+            </div>                   
             </div>
             <div class="col-12 col-sm-12 col-md-4 col-lg-4 cart__footer">
                     {% comment %} <div class="cart-note">
@@ -248,17 +262,11 @@
                     <span class="col-12 col-sm-6 cart__subtotal-title cart__subtotal text-left"><span class="money">{{total}}تومان</span></span>
                     </div>
                     <div class="cart__shipping">حمل و نقل و مالیات در پرداخت محاسبه شده است</div>
-                    <p class="cart_tearm">
-                    <label>
-                        <input type="checkbox" name="tearm" id="cartTearm" class="checkbox" value="tearm" required="">
-                        با شرایط و ضوابط موافقم
-                    </label>
-                    </p>
+                    
                     <form method='post' action='{% url "account:login" %}' >
                     {% csrf_token %}
                     <input type="submit" name="checkout" id="cartCheckout" class="btn btn--small-wide checkout" value="پرداخت">
                     </form>
-                    <div class="paymnet-img"><img src="{% static 'assets/images/payment-img.jpg' %}" alt="Payment"></div>
                 </div>
             </div>
         </div>
@@ -274,7 +282,7 @@
 </script>
 <script>
     $(document).ready(function(){
-        $('#removebtn').click(function(e){
+        $('.removebtn').click(function(e){
             e.preventDefault()
             Swal.fire({
                 title: 'ایا میخواهید این محصول را از سبد خرید خود حذف کنید؟',
@@ -286,7 +294,7 @@
                 confirmButtonText: 'بله'
                 }).then((result) => {
                 if (result.isConfirmed) {
-                    x = $('#removebtn').data('href')
+                    x = $(this).data('href')
                     location.href="/removecookie/" + x
                 }
             })

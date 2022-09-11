@@ -22,8 +22,6 @@ def registerView(request):
 def send_sms_test(request):
     number = random.randint(1000, 9999)
     if request.method == "POST":
-
-
         form=PhoneNumber(request.POST)
         if form.is_valid():
 
@@ -81,11 +79,13 @@ def ComplateProfile(request):
             username=phone_c,password=make_password(password)
         )
         messages.success(request,'پروفایل شما با موفقیت ساخته شد')
+        user = MyUser.objects.get(username=phone_c)
+        if user.is_verify:
+            login(request, user)
     return redirect('/')
 
 def respass(request):
     return render(request,'account/eghdam.html')
-
 
 
 def SendSmsReset(request):
@@ -108,8 +108,6 @@ def SendSmsReset(request):
     response.set_cookie('phone_number_cookie',x,1000)
     return response
 
-
-
 def ResetProfileView(request):
     return render(request,'account/ResetPasswordView.html',{})
 
@@ -123,7 +121,6 @@ def ResetProfile(request):
         )
         messages.success(request,'عملیات با موفقیت انجام شد')
     return redirect('/')
-
 
 def VerifyChecked2(request):
     if request.method == "POST":
@@ -140,8 +137,6 @@ def VerifyChecked2(request):
             messages.success(request,'!!! کدارسالی را درست وارد کنید')
         return redirect('/')
     return render(request,'account/ResetPasswordView.html')
-
-
 
 def Login(request):
     if request.user.is_authenticated:
@@ -164,13 +159,10 @@ def Login(request):
                         sabad = Order.objects.create(
                             id=order,owner=request.user
                         )
-                        # calculate price
                         for x in orderdetail:
-                            
                             product=Product.objects.get(id=orderdetail[x]['id'])
                             color =orderdetail[x]['color']
                             size = orderdetail[x]['size']
-
                             price_color = 0
                             try:
                                 m = product.color_set.get(color=color)
@@ -184,7 +176,6 @@ def Login(request):
                                 price_size = m.Ekhtelaf
                             except:
                                 pass
-                        # end
                             total_price =  price_size + price_color + product.main_discount_cal(inti=True)
                             
                             OrderDetail.objects.create(

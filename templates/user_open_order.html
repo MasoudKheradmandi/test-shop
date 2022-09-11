@@ -114,7 +114,7 @@
         <div class="container">
         	<div class="row">
                 <div class="col-12 col-sm-12 col-md-8 col-lg-8 main-col">
-                	<form action="#" method="post" class="cart style2">
+                	<div class="cart style2">
                 		<table>
                             <thead class="cart__row cart__header">
                                 <tr>
@@ -122,18 +122,25 @@
                                     <th class="text-center">قیمت</th>
                                     <th class="text-center">تعداد</th>
                                     <th class="text-center">مجموع</th>
+                                    <th class="text-center"></th>
                                     <th class="action">&nbsp;</th>
                                 </tr>
                             </thead>
                     		<tbody>
                             {% for det in details %}
+                            <form method='post' action="{% url 'Cart:update_In_open_order' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name='product_id' value="{{det.product.id}}">                     
+                                <input type="hidden" name='size' value="{{det.size}}">
+                                <input type="hidden" name='color' value="{{det.color}}">
+    
                                 <tr class="cart__row border-bottom line1 cart-flex border-top">
                                     <td class="cart__image-wrapper cart-flex-item">
-                                        <a href="#"><img class="cart__image" src="{{det.product.image.url}}" alt="Elastic Waist Dress - Navy / Small"></a>
+                                        <a href="{% url 'poduct:detailview' det.product.id %}"><img class="cart__image" src="{{det.product.image.url}}" alt="Elastic Waist Dress - Navy / Small"></a>
                                     </td>
                                     <td class="cart__meta small--text-left cart-flex-item">
                                         <div class="list-view-item__title">
-                                            <a href="#">{{det.product}}</a>
+                                            <a href="{% url 'poduct:detailview' det.product.id %}">{{det.product}}</a>
                                         </div>
                                         
                                         <div class="cart__meta-text">
@@ -148,7 +155,7 @@
                                         <div class="cart__qty text-center">
                                             <div class="qtyField">
                                                 <a class="qtyBtn minus" href="javascript:void(0);"><i class="icon icon-minus"></i></a>
-                                                <input data-max="{% tedad_mahsole det.product.id %}" class="cart__qty-input qty" max="{% tedad_mahsole det.product.id %}" type="number"  value="{{det.count}}" pattern="[0-9]*" disabled>
+                                                <input data-max="{% tedad_mahsole2 det.product.id %}" class="cart__qty-input qty" name='count' type="text"  value="{{det.count}}">
                                                 <a class="qtyBtn plus" href="javascript:void(0);"><i class="icon icon-plus"></i></a>
                                             </div>
                                         </div>
@@ -158,13 +165,14 @@
                                         <div><span class="money">{{det.get_detail_sum}}</span></div>
                                     </td>
                                     <td class="text-center small--hide"><a class="removebtn" data-href='{{det.id}}' class="btn btn--secondary cart__remove" title="حذف"><i class="icon icon anm anm-times-l"></i></a></td>
+                                    <td colspan="3" class="text-left"><button type="submit" class="btn--link cart-update"><i class="fa fa-refresh"></i> به روز رسانی</button></td>
                                 </tr>
+                            </form>
                                 {% endfor %}
                             </tbody>
                     		<tfoot>
                                 <tr>
                                     <td colspan="3" class="text-right"><a  href="{% url 'poduct:listview' %}" class="btn--link cart-continue"><i class="icon icon-arrow-circle-right"></i> ادامه خرید</a></td>
-                                    {% comment %} <td colspan="3" class="text-left"><button type="submit" name="update" class="btn--link cart-update"><i class="fa fa-refresh"></i> به روز رسانی</button></td> {% endcomment %}
                                 </tr>
                             </tfoot>
                     </table>
@@ -237,7 +245,7 @@
   							</div>
                         </div> {% endcomment %}
                     </div>
-                    </form>                   
+                </div>                   
                	</div>
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4 cart__footer">
                 	{% comment %} <div class="cart-note">

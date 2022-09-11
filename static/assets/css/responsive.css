@@ -1054,14 +1054,16 @@
     .cart thead,
     .cart-price,
     .cart .cart__update-wrapper {
-        display: none;
+        /* display: none; */
         padding-top: 0;
-        padding-bottom: 15px;
+        /* padding-bottom: 15px; */
     }
-
-    .cart .small--hide {
+.cart__qty-input{
+    width: 30px!important;
+}
+    /* .cart .small--hide {
         display: none;
-    }
+    } */
 
     .cart tr,
     .cart tbody {

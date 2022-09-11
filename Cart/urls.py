@@ -10,6 +10,7 @@ urlpatterns = [
     path('removecookie/<int:id>/',views.remove_from_cookie,name='removeck'),
     path('paid/',views.order_payed,name='paid'),
     path('address/',views.addressView,name='address'),
+    path('update_In/',views.update_In_open_order,name='update_In_open_order'),
 ]
 
 
