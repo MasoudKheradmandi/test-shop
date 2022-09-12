@@ -44,7 +44,7 @@ def add_user_order(request):
             pass
         total_price = price_color + price_size + product.main_discount_cal(inti=True)
         if request.user.is_authenticated:
-            if order.orderdetail_set.filter(product=product):
+            if order.orderdetail_set.filter(product=product,size=size,color=color):
                 order.orderdetail_set.filter(
                     product=product
                 ).update(count=count,size=size,color=color,price=total_price)
@@ -127,7 +127,7 @@ def user_open_order(request):
 
     return render(request,'user_open_order.html',context)
 
-def remover_order_detail(request,product_id):
+def remover_order_detail(request,id):
     # # order_detail = product_id
     # if product_id:
     #     order_detail = OrderDetail.objects.get(id=product_id)
@@ -135,7 +135,7 @@ def remover_order_detail(request,product_id):
     #     if order_detail:
     #         order_detail.delete()
     order = Order.objects.get(owner=request.user,is_paid=False)
-    x = order.orderdetail_set.get(product_id = product_id)
+    x = order.orderdetail_set.get(id=id)
     x.delete()
     return redirect('/cart')
  

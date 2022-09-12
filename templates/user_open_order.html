@@ -157,7 +157,7 @@
                                     <td class="small--hide cart-price">
                                         <div><span class="money">{{det.get_detail_sum}}</span></div>
                                     </td>
-                                    <td class="text-center small--hide"><a id="removebtn" href="#" data-href='{{det.product_id}}' class="btn btn--secondary cart__remove" title="حذف"><i class="icon icon anm anm-times-l"></i></a></td>
+                                    <td class="text-center small--hide"><a class="removebtn" data-href='{{det.id}}' class="btn btn--secondary cart__remove" title="حذف"><i class="icon icon anm anm-times-l"></i></a></td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -274,7 +274,7 @@
 </script>
 <script>
     $(document).ready(function(){
-        $('#removebtn').click(function(e){
+        $('.removebtn').click(function(e){
             e.preventDefault()
             Swal.fire({
                 title: 'ایا میخواهید این محصول را از سبد خرید خود حذف کنید؟',
@@ -286,7 +286,8 @@
                 confirmButtonText: 'بله'
                 }).then((result) => {
                 if (result.isConfirmed) {
-                    x = $('#removebtn').data('href')
+                    x = $(this).data('href')
+
                     location.href="/remove/" + x
                 }
             })

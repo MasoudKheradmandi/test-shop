@@ -68,13 +68,14 @@ def DetailView(request,id):
         'producttabs':ProductTab.objects.all(),
         'form' : form,
     }
-    try:
-        m=request.COOKIES['OrderDetail']
-        details = json.loads(m)
-        context['color_a'] = details[product.id]['color']
-        context['size_a'] = details[product.id]['size']
-    except KeyError:
-        pass
+    if not request.user.is_authenticated:
+        try:
+            m=request.COOKIES['OrderDetail']
+            details = json.loads(m)
+            context['color_a'] = details[product.id]['color']
+            context['size_a'] = details[product.id]['size']
+        except KeyError:
+            pass
     
     return render(request,'detailview.html',context)
  
