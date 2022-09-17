@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import *
 from django.forms import TextInput
+
 # Register your models here.
 class SizeInline(admin.TabularInline):
     model = Size
