@@ -1,5 +1,6 @@
 from django.shortcuts import render,get_object_or_404,redirect
 from .models import Order,OrderDetail
+import base64
 from product.models import Product
 from .forms import NewOrderForm
 from django.http import HttpResponse
@@ -7,7 +8,6 @@ import json
 from payment.models import PayedOrder , PayedOrderDetail
 from django.utils import timezone
 from account.models import Profile
-from cryptography.fernet import Fernet
 from account.forms import InfoForm
 from Cart.forms import NewOrderForm
 # Create your views here.
@@ -57,7 +57,12 @@ def add_user_order(request):
         else:
             try:
                 x = request.COOKIES['OrderDetail']
-                jsonstyle = json.loads(x)
+                base64_string =x
+                base64_bytes = base64_string.encode("ascii")
+                
+                sample_string_bytes = base64.b64decode(base64_bytes)
+                sample_string = sample_string_bytes.decode("ascii")
+                jsonstyle = json.loads(sample_string)
                 orderdetail = OrderDetail.objects.create(product=product,color=color,count=count,size=size,price=total_price)
                 
                 for x in jsonstyle:
@@ -79,18 +84,28 @@ def add_user_order(request):
                 
                 orderdetail.delete()
                 jsonstyle2 = json.dumps(jsonstyle)
+                sample_string = jsonstyle2
+                sample_string_bytes = sample_string.encode("ascii")
+                
+                base64_bytes = base64.b64encode(sample_string_bytes)
+                base64_string = base64_bytes.decode("ascii")
                 response = redirect('/cart')
                 response.delete_cookie('OrderDetail')
-                response.set_cookie('OrderDetail',jsonstyle2,172800)
+                response.set_cookie('OrderDetail',base64_string,172800)
                 return response 
             except:
                 order = Order.objects.create()
                 orderdetail = OrderDetail.objects.create(product=product,color=color,count=count,size=size,price=total_price)
                 x = {orderdetail.id:{'id':product_id,'color':color,'size':size,'count':count}}
                 orderdetail.delete()
-                jsonstyle = json.dumps(x)
+                jsonstyle = json.dumps(x)#dump is json string
+                sample_string = jsonstyle
+                sample_string_bytes = sample_string.encode("ascii")
+                
+                base64_bytes = base64.b64encode(sample_string_bytes)
+                base64_string = base64_bytes.decode("ascii")
                 response = redirect('/cart')
-                response.set_cookie('OrderDetail',jsonstyle,172800)
+                response.set_cookie('OrderDetail',base64_string,172800)
                 response.set_cookie('Order',order.id,172800)
                 order.delete()
                 return response 
@@ -126,7 +141,12 @@ def user_open_order(request):
         total_price = 0
         try:
             detail = request.COOKIES['OrderDetail']
-            z = json.loads(detail)
+            base64_string =detail
+            base64_bytes = base64_string.encode("ascii")
+            
+            sample_string_bytes = base64.b64decode(base64_bytes)
+            sample_string = sample_string_bytes.decode("ascii")
+            z = json.loads(sample_string)
             for det in z:
                 id = z[det]['id']
                 product = Product.objects.get(id=id)
@@ -171,12 +191,22 @@ def remover_order_detail(request,id):
  
 def remove_from_cookie(request,id):
     x = request.COOKIES['OrderDetail']
-    f = json.loads(x)
+    base64_string =x
+    base64_bytes = base64_string.encode("ascii")
+    
+    sample_string_bytes = base64.b64decode(base64_bytes)
+    sample_string = sample_string_bytes.decode("ascii")
+    f = json.loads(sample_string)
     del f[str(id)]
     m = json.dumps(f)
+    sample_string = m
+    sample_string_bytes = sample_string.encode("ascii")
+    
+    base64_bytes = base64.b64encode(sample_string_bytes)
+    base64_string = base64_bytes.decode("ascii")
     response = redirect('/cart')
     response.delete_cookie('OrderDetail')
-    response.set_cookie('OrderDetail',m,172800)
+    response.set_cookie('OrderDetail',base64_string,172800)
     return response
 
 def order_payed(request):
@@ -255,7 +285,12 @@ def update_In_open_order(request):
         else:
             try:
                 x = request.COOKIES['OrderDetail']
-                jsonstyle = json.loads(x)
+                base64_string =x
+                base64_bytes = base64_string.encode("ascii")
+                
+                sample_string_bytes = base64.b64decode(base64_bytes)
+                sample_string = sample_string_bytes.decode("ascii")
+                jsonstyle = json.loads(sample_string)
                 orderdetail = OrderDetail.objects.create(product=product,color=color,count=count,size=size,price=total_price)
                 
                 for x in jsonstyle:
@@ -264,9 +299,14 @@ def update_In_open_order(request):
                 
                 orderdetail.delete()
                 jsonstyle2 = json.dumps(jsonstyle)
+                sample_string = jsonstyle2
+                sample_string_bytes = sample_string.encode("ascii")
+                
+                base64_bytes = base64.b64encode(sample_string_bytes)
+                base64_string = base64_bytes.decode("ascii")
                 response = redirect('/cart')
                 response.delete_cookie('OrderDetail')
-                response.set_cookie('OrderDetail',jsonstyle2,172800)
+                response.set_cookie('OrderDetail',base64_string,172800)
                 return response 
             except:
                 order = Order.objects.create()
@@ -274,8 +314,13 @@ def update_In_open_order(request):
                 x = {orderdetail.id:{'id':product_id,'color':color,'size':size,'count':count}}
                 orderdetail.delete()
                 jsonstyle = json.dumps(x)
+                sample_string = jsonstyle
+                sample_string_bytes = sample_string.encode("ascii")
+                
+                base64_bytes = base64.b64encode(sample_string_bytes)
+                base64_string = base64_bytes.decode("ascii")
                 response = redirect('/cart')
-                response.set_cookie('OrderDetail',jsonstyle,172800)
+                response.set_cookie('OrderDetail',base64_string,172800)
                 response.set_cookie('Order',order.id,172800)
                 order.delete()
                 return response 

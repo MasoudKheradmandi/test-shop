@@ -1,4 +1,5 @@
 import json
+import base64
 from django.shortcuts import render , get_object_or_404
 from django.http import  JsonResponse
 from django.db.models import Q
@@ -71,7 +72,12 @@ def DetailView(request,id):
     if not request.user.is_authenticated:
         try:
             m=request.COOKIES['OrderDetail']
-            details = json.loads(m)
+            base64_string =m
+            base64_bytes = base64_string.encode("ascii")
+            
+            sample_string_bytes = base64.b64decode(base64_bytes)
+            sample_string = sample_string_bytes.decode("ascii")
+            details = json.loads(sample_string)
             context['color_a'] = details[product.id]['color']
             context['size_a'] = details[product.id]['size']
         except KeyError:
